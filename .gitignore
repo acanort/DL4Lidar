@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+
+# Environments
+.venv/
+env/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data
+data/raw/
+data/processed/
+data/coco/
+
+# Outputs
+outputs/
+models/
+*.pth
+*.pt
+*.pkl
+*.onnx
+
+# IDE / OS
+.vscode/
+.DS_Store
+Thumbs.db

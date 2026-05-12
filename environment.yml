@@ -1,0 +1,31 @@
+name: d2-rtx5070
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+      - opencv-python
+      - yacs
+      - termcolor
+      - tabulate
+      - tqdm
+      - cloudpickle
+      - iopath
+      - fvcore
+      - pycocotools
+      - "setuptools<81"
+      - numpy
+      - pandas
+      - matplotlib
+      - pillow
+      - scikit-learn
+      - pyyaml
+      - rich
+      - jupyter
+      - ipykernel
+      - tensorboard
+      - black
+      - isort
+      - ruff
+      - pytest
