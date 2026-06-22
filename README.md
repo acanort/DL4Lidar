@@ -267,3 +267,23 @@ separately validated PyTorch and Detectron2 stack.
 after selecting `cu126`, `cu129`, or `cpu`, because it would attempt to replace
 that selection with the CUDA 12.8 builds. The shared dependencies are already
 installed by `environment.yml`.
+
+## Citation
+
+If you use this project in your research, please cite the associated article:
+
+> Adrián Canella-Ortiz et al., "Generalizable Deep Learning for Aerosol and
+> Cloud Segmentation in Ground-Based and Spaceborne Lidar Observations,"
+> *IEEE Transactions on Geoscience and Remote Sensing*, 2026.
+
+The project archive is planned for publication on Zenodo under
+[DOI 10.5281/zenodo.20156234](https://doi.org/10.5281/zenodo.20156234). Please
+use the citation metadata provided by Zenodo once the record is published.
+
+## License
+
+Copyright (C) 2026 Adrián Canella Ortiz and contributors.
+
+This project is licensed under the GNU General Public License, version 3 or (at
+your option) any later version. See [LICENSE](LICENSE) for the complete license
+text.
