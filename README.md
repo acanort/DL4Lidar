@@ -45,18 +45,103 @@ cd DL4Lidar
 
 ## Installation
 
-The provided environment targets Python 3.9, PyTorch 2.8, CUDA 12.8, and a
-matching Detectron2 build.
+The reference setup uses Windows 11, Python 3.9, PyTorch 2.8, CUDA 12.8, and a
+precompiled Detectron2 wheel. Before starting, install:
 
-```bash
-conda env create -f environment.yml
-conda activate d2-rtx5070
-pip install -r requirements.txt
+- Git and Git LFS
+- Miniconda or Anaconda
+- a current NVIDIA driver
+
+Check that the GPU and driver are visible:
+
+```console
+nvidia-smi
 ```
 
-The PyTorch and Detectron2 packages in `requirements.txt` are CUDA-specific.
-For a different CUDA version or a CPU-only system, install compatible PyTorch,
-Torchvision, Torchaudio, and Detectron2 builds.
+Run the installation commands below in an Anaconda Prompt from the repository
+root.
+
+### Reference installation: NVIDIA GPU and CUDA 12.8
+
+Create a fresh environment containing the shared project dependencies:
+
+```console
+conda env create -n d2-dl4lidar -f environment.yml
+conda activate d2-dl4lidar
+python -m pip install --upgrade pip wheel "setuptools<81"
+```
+
+Install the official PyTorch 2.8 wheels for CUDA 12.8:
+
+```console
+python -m pip install torch==2.8.0+cu128 torchvision==0.23.0+cu128 torchaudio==2.8.0+cu128 --index-url https://download.pytorch.org/whl/cu128
+```
+
+Install the matching precompiled Detectron2 wheel:
+
+```console
+python -m pip install --extra-index-url https://miropsota.github.io/torch_packages_builder "detectron2==0.6+18f6958pt2.8.0cu128"
+```
+
+This Detectron2 package is a third-party Windows wheel from
+[`torch_packages_builder`](https://github.com/MiroPsota/torch_packages_builder),
+not an official Detectron2 binary. It avoids compiling Detectron2's C++ and
+CUDA extensions locally.
+
+The Conda environment already installs the remaining packages from
+`environment.yml`. Running the following is optional after PyTorch and
+Detectron2 are installed, and verifies that all pins in `requirements.txt` are
+satisfied:
+
+```console
+python -m pip install -r requirements.txt
+```
+
+### Verify the installation
+
+```console
+python -c "import torch, detectron2; print('PyTorch:', torch.__version__); print('CUDA runtime:', torch.version.cuda); print('CUDA available:', torch.cuda.is_available()); print('Detectron2:', detectron2.__version__); print('GPU:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'none')"
+python src/inference.py --help
+```
+
+Run a one-image inference test:
+
+```console
+python src/inference.py --classes cloud --max-images 1 --output-mode predictions --output inference/smoke_test
+```
+
+### Other graphics cards and CPU-only systems
+
+The required package variant depends on the operating system, GPU, and NVIDIA
+driver—not only on the graphics-card model. Use `nvidia-smi` to check the
+driver, then consult the
+[official PyTorch installer](https://pytorch.org/get-started/locally/) before
+choosing a CUDA build.
+
+Precompiled Windows/Python 3.9 Detectron2 wheels matching PyTorch 2.8 are
+available for `cu126`, `cu128`, `cu129`, and `cpu`. PyTorch and Detectron2 must
+use the same variant. For example, a CUDA 12.6 installation uses:
+
+```console
+python -m pip install torch==2.8.0+cu126 torchvision==0.23.0+cu126 torchaudio==2.8.0+cu126 --index-url https://download.pytorch.org/whl/cu126
+python -m pip install --extra-index-url https://miropsota.github.io/torch_packages_builder "detectron2==0.6+18f6958pt2.8.0cu126"
+```
+
+For a Windows system without a compatible NVIDIA GPU, use the CPU builds:
+
+```console
+python -m pip install torch==2.8.0+cpu torchvision==0.23.0+cpu torchaudio==2.8.0+cpu --index-url https://download.pytorch.org/whl/cpu
+python -m pip install --extra-index-url https://miropsota.github.io/torch_packages_builder "detectron2==0.6+18f6958pt2.8.0cpu"
+```
+
+CPU inference is supported but is substantially slower. On Windows, AMD and
+Intel graphics users should use the CPU instructions unless they have a
+separately validated PyTorch and Detectron2 stack.
+
+`requirements.txt` pins the reference `cu128` packages. Do not run it unchanged
+after selecting `cu126`, `cu129`, or `cpu`, because it would attempt to replace
+that selection with the CUDA 12.8 builds. The shared dependencies are already
+installed by `environment.yml`.
 
 ## Data
 
