@@ -1,4 +1,4 @@
-# DL4Lidar: Aerosol and Cloud Segmentation
+# DL4Lidar: Aerosol and Cloud Segmentation from lidar RCS data
 
 DL4Lidar uses Detectron2 instance-segmentation models to identify atmospheric
 aerosol and cloud layers in lidar RCS images. The project provides training and
