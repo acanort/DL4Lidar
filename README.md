@@ -1,9 +1,9 @@
 # DL4Lidar: Aerosol and Cloud Segmentation
 
 DL4Lidar uses Detectron2 instance-segmentation models to identify atmospheric
-aerosol and cloud layers in lidar RCS images. The repository provides training
-and inference code, COCO-format annotations, example image datasets, and
-trained models using ALHAMBRA Raman lidar data (UGR Station, Granada, Spain).
+aerosol and cloud layers in lidar RCS images. The project provides training and
+inference code, access to COCO-format datasets, and trained models using
+ALHAMBRA Raman lidar data (UGR Station, Granada, Spain).
 
 ## Citation
 
@@ -13,7 +13,7 @@ If you use this project in your research, please cite the associated article:
 > Cloud Segmentation in Ground-Based and Spaceborne Lidar Observations,"
 > *IEEE Transactions on Geoscience and Remote Sensing*, 2026.
 
-The project archive is planned for publication on Zenodo under
+The dataset archive has been assigned
 [DOI 10.5281/zenodo.20156234](https://doi.org/10.5281/zenodo.20156234). Please
 use the citation metadata provided by Zenodo once the record is published.
 
@@ -21,13 +21,6 @@ use the citation metadata provided by Zenodo once the record is published.
 
 ```text
 DL4Lidar/
-  data/
-    alhambra/
-      annotations/
-      images/
-    mulhacen/
-      annotations/
-      images/
   models/
     alhambra/
       aerosol/
@@ -37,6 +30,7 @@ DL4Lidar/
         cloud_config.yaml
         cloud_weights.pth
   src/
+    download_data.py
     train.py
     inference.py
   environment.yml
@@ -56,7 +50,30 @@ cd DL4Lidar
 
 ## Data
 
-The datasets use COCO-format annotations and the following directory layout:
+The dataset is distributed separately through Zenodo. After cloning the
+repository, download and prepare it with:
+
+```console
+python src/download_data.py
+```
+
+The script obtains the archive associated with DOI
+`10.5281/zenodo.20156234`, validates its contents, and creates `data/` in the
+repository root. It supports ZIP archives directly. RAR archives require
+WinRAR/UnRAR or 7-Zip to be installed and available on the system.
+
+If the archive has already been downloaded, prepare it without accessing
+Zenodo:
+
+```console
+python src/download_data.py --archive path/to/DL4Lidar.rar
+```
+
+The script refuses to overwrite an existing `data/` directory. Use `--replace`
+only when the existing local dataset should be replaced.
+
+The extracted dataset uses COCO-format annotations and the following directory
+layout:
 
 ```text
 data/{instrument}/
