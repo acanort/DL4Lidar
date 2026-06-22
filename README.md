@@ -1,29 +1,31 @@
 # DL4Lidar: Aerosol and Cloud Segmentation
 
-This repository contains Detectron2 code, COCO-format annotations, selected
-lidar images, and trained models for instance segmentation of atmospheric
-aerosol and cloud layers.
+DL4Lidar uses Detectron2 instance-segmentation models to identify atmospheric
+aerosol and cloud layers in lidar images. The repository provides training and
+inference code, COCO-format annotations, example image datasets, and trained
+Alhambra models.
 
-## Published contents
+## Repository structure
 
 ```text
 DL4Lidar/
   data/
     alhambra/
-      annotations/                 # aerosol, cloud, and combined annotations
+      annotations/
       images/
-        1064fta/3e8/               # published image subset
-        532fta/2e7/                # published image subset
+        1064fta/3e8/
+        532fta/2e7/
     mulhacen/
-      annotations/                 # all available Mulhacen annotations
-      images/                      # all available Mulhacen images
-  models/alhambra/
-    aerosol/
-      aerosol_config.yaml
-      aerosol_weights.pth
-    cloud/
-      cloud_config.yaml
-      cloud_weights.pth
+      annotations/
+      images/
+  models/
+    alhambra/
+      aerosol/
+        aerosol_config.yaml
+        aerosol_weights.pth
+      cloud/
+        cloud_config.yaml
+        cloud_weights.pth
   src/
     train.py
     inference.py
@@ -32,12 +34,8 @@ DL4Lidar/
   pyproject.toml
 ```
 
-Only the data paths shown above are tracked. Other local datasets, including
-`data/chm15k/`, are intentionally excluded by `.gitignore`. Generated training
-and inference outputs are also excluded.
-
-The model weights are stored with Git LFS. Install Git LFS before cloning if you
-want Git to download the weight files automatically:
+The model weights are stored with Git LFS. Install Git LFS before cloning to
+download them automatically:
 
 ```bash
 git lfs install
@@ -45,11 +43,10 @@ git clone https://github.com/acanort/DL4Lidar.git
 cd DL4Lidar
 ```
 
-## Environment
+## Installation
 
-The pinned environment targets Python 3.9, PyTorch 2.8, CUDA 12.8, and a
-matching Detectron2 build. Create the Conda environment and install the pinned
-Python packages with:
+The provided environment targets Python 3.9, PyTorch 2.8, CUDA 12.8, and a
+matching Detectron2 build.
 
 ```bash
 conda env create -f environment.yml
@@ -57,13 +54,13 @@ conda activate d2-rtx5070
 pip install -r requirements.txt
 ```
 
-The PyTorch and Detectron2 versions in `requirements.txt` are CUDA-specific.
-They may require the corresponding wheel indexes, and must be changed for a
-different CUDA or CPU-only environment.
+The PyTorch and Detectron2 packages in `requirements.txt` are CUDA-specific.
+For a different CUDA version or a CPU-only system, install compatible PyTorch,
+Torchvision, Torchaudio, and Detectron2 builds.
 
-## Dataset layout
+## Data
 
-The training code expects images and COCO annotation JSON files in this form:
+The datasets use COCO-format annotations and the following directory layout:
 
 ```text
 data/{instrument}/
@@ -83,45 +80,47 @@ data/{instrument}/
     image files
 ```
 
-The published Alhambra annotations include `aerosol`, `cloud`, and `combined`
-sets. The published Alhambra images are limited to `1064fta/3e8` and
-`532fta/2e7`. Mulhacen includes its available annotation and image folders.
+The Alhambra dataset contains aerosol, cloud, and combined annotations, with
+images for the `1064fta/3e8` and `532fta/2e7` configurations. The Mulhacen data
+contains aerosol and cloud test annotations together with the corresponding
+`1064xta/3e8` and `532xpa/1e7` images.
 
 ## Training
 
-`src/train.py` implements one train/validation/test dataset workflow. It
-provides:
+`src/train.py` implements a complete holdout training workflow with:
 
 - COCO annotation and image validation
-- Detectron2 dataset registration and configuration
+- Detectron2 dataset registration and model configuration
 - validation-loss monitoring
 - learning-rate reduction on a plateau
-- best-checkpoint restoration
 - early stopping
-- metric logs, a run summary, and a training plot
+- best-checkpoint restoration
+- metric logs, training summaries, and loss plots
 
-There is no command-line interface for training. Edit the user-configuration
-block near the top of `src/train.py`, then run:
-
-```bash
-python src/train.py
-```
-
-The committed defaults select the included Alhambra cloud holdout data at
-`data/alhambra/images/1064fta/3e8`. Important settings include:
+Configure a training run by editing the user-configuration block near the top
+of `src/train.py`. The default settings train a cloud model with the Alhambra
+`1064fta/3e8` images and holdout annotations:
 
 ```python
 INSTRUMENT = "alhambra"
 ANNOTATION_SET = "cloud"
 CHANNEL = "1064fta"
 SCALE = "3e8"
+
 ARCHITECTURE = "mask_rcnn_R_101_FPN_3x"
 MAX_EPOCHS = 300
 IMS_PER_BATCH = 8
 ```
 
-Runs are written below `outputs/train/` by default. Each timestamped run can
-contain:
+Start training from the repository root:
+
+```bash
+python src/train.py
+```
+
+Each run is saved under `outputs/train/` in a timestamped directory containing
+the model checkpoint, Detectron2 configuration, metric logs, training summary,
+and training plot:
 
 ```text
 checkpoints/model_best.pth
@@ -132,22 +131,16 @@ logs/training_summary.json
 plots/training_process.png
 ```
 
-To create a holdout or cross-validation variant, copy `src/train.py` locally
-and adapt its configuration and orchestration. Files such as
-`train_holdout.py` and `train_5_fold_cross_validation.py` are not part of this
-repository.
-
 ## Inference
 
-`src/inference.py` loads the published model config and weight pair for each
-selected class. The default command runs the cloud model on the included
-Alhambra `1064fta/3e8` images:
+`src/inference.py` can run the aerosol model, the cloud model, or both models.
+The default command runs cloud inference on the Alhambra `1064fta/3e8` images:
 
 ```bash
 python src/inference.py
 ```
 
-Run both aerosol and cloud models on the same published image folder:
+To run both models:
 
 ```bash
 python src/inference.py \
@@ -159,26 +152,34 @@ python src/inference.py \
   --batch-size 1
 ```
 
-Useful options include:
+Additional examples:
 
 ```bash
+# Show all options
 python src/inference.py --help
+
+# Run only the aerosol model
 python src/inference.py --classes aerosol
+
+# Save predictions without visual outputs
 python src/inference.py --output-mode predictions
+
+# Process ten images and save a reduced set of visual outputs
 python src/inference.py --output-mode quick --max-images 10
+
+# Force CPU inference
 python src/inference.py --device cpu
 ```
 
-The output directory always receives `predictions.json`, `predictions.csv`,
-and `run_summary.json`. Depending on `--output-mode`, it can also contain PNG
-masks, JPEG overlays, and comparison plots. Inference outputs are ignored by
-Git.
+Inference creates:
 
-## Notes
+- `predictions.json` with structured predictions
+- `predictions.csv` with instance-level results
+- `run_summary.json` with model and run settings
+- PNG segmentation masks
+- translucent and opaque JPEG overlays
+- comparison plots
 
-- Model weights are large Git LFS objects: approximately 480 MB for aerosol
-  and 953 MB for cloud.
-- `outputs/`, `inference/`, caches, virtual environments, and unpublished data
-  remain local and are not committed.
-- Keep `.gitignore` and this README synchronized whenever the published data or
-  source-file selection changes.
+The visual files produced depend on the selected `--output-mode`. Use
+`predictions` for tabular results only, `quick` for a reduced set of visuals,
+or `full` for all outputs.
