@@ -5,6 +5,18 @@ aerosol and cloud layers in lidar RCS images. The repository provides training
 and inference code, COCO-format annotations, example image datasets, and
 trained models using ALHAMBRA Raman lidar data (UGR Station, Granada, Spain).
 
+## Citation
+
+If you use this project in your research, please cite the associated article:
+
+> Adrián Canella-Ortiz et al., "Generalizable Deep Learning for Aerosol and
+> Cloud Segmentation in Ground-Based and Spaceborne Lidar Observations,"
+> *IEEE Transactions on Geoscience and Remote Sensing*, 2026.
+
+The project archive is planned for publication on Zenodo under
+[DOI 10.5281/zenodo.20156234](https://doi.org/10.5281/zenodo.20156234). Please
+use the citation metadata provided by Zenodo once the record is published.
+
 ## Repository structure
 
 ```text
@@ -267,18 +279,6 @@ separately validated PyTorch and Detectron2 stack.
 after selecting `cu126`, `cu129`, or `cpu`, because it would attempt to replace
 that selection with the CUDA 12.8 builds. The shared dependencies are already
 installed by `environment.yml`.
-
-## Citation
-
-If you use this project in your research, please cite the associated article:
-
-> Adrián Canella-Ortiz et al., "Generalizable Deep Learning for Aerosol and
-> Cloud Segmentation in Ground-Based and Spaceborne Lidar Observations,"
-> *IEEE Transactions on Geoscience and Remote Sensing*, 2026.
-
-The project archive is planned for publication on Zenodo under
-[DOI 10.5281/zenodo.20156234](https://doi.org/10.5281/zenodo.20156234). Please
-use the citation metadata provided by Zenodo once the record is published.
 
 ## License
 
