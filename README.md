@@ -10,8 +10,8 @@ ALHAMBRA Raman lidar data (UGR Station, Granada, Spain).
 If you use this project in your research, please cite the associated article:
 
 > Adrián Canella-Ortiz et al., "Generalizable Deep Learning for Aerosol and
-> Cloud Segmentation in Ground-Based and Spaceborne Lidar Observations,"
-> *IEEE Transactions on Geoscience and Remote Sensing*, 2026.
+> Cloud Segmentation in Ground-Based and Spaceborne Lidar Observations",
+> *IEEE Transactions on Geoscience and Remote Sensing*, 2026 (In Press).
 
 The dataset archive has been assigned
 [DOI 10.5281/zenodo.20156234](https://doi.org/10.5281/zenodo.20156234). Please
