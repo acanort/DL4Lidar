@@ -1,9 +1,9 @@
 # DL4Lidar: Aerosol and Cloud Segmentation
 
 DL4Lidar uses Detectron2 instance-segmentation models to identify atmospheric
-aerosol and cloud layers in lidar images. The repository provides training and
-inference code, COCO-format annotations, example image datasets, and trained
-Alhambra models.
+aerosol and cloud layers in lidar RCS images. The repository provides training
+and inference code, COCO-format annotations, example image datasets, and
+trained models using ALHAMBRA Raman lidar data (UGR Station, Granada, Spain).
 
 ## Repository structure
 
