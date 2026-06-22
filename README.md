@@ -13,7 +13,6 @@ DL4Lidar/
     alhambra/
       annotations/
       images/
-
     mulhacen/
       annotations/
       images/
