@@ -14,20 +14,57 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data
-data/raw/
-data/processed/
-data/coco/
+# Temporary datasets
+data_tmp/
+data_zenodo/
 
-# Outputs
+# Generated outputs
 outputs/
-models/
+inference/
+
+# Model artifacts outside the models folder
 *.pth
 *.pt
 *.pkl
 *.onnx
 
+# Track only the selected dataset paths.
+data/*
+!data/alhambra/
+data/alhambra/*
+!data/alhambra/annotations/
+!data/alhambra/annotations/**
+!data/alhambra/images/
+data/alhambra/images/*
+!data/alhambra/images/1064fta/
+data/alhambra/images/1064fta/*
+!data/alhambra/images/1064fta/3e8/
+!data/alhambra/images/1064fta/3e8/**
+!data/alhambra/images/532fta/
+data/alhambra/images/532fta/*
+!data/alhambra/images/532fta/2e7/
+!data/alhambra/images/532fta/2e7/**
+!data/mulhacen/
+data/mulhacen/*
+!data/mulhacen/annotations/
+!data/mulhacen/annotations/**
+!data/mulhacen/images/
+!data/mulhacen/images/**
+
+# Track all model files, including model artifact extensions.
+!models/
+!models/**
+
 # IDE / OS
 .vscode/
 .DS_Store
 Thumbs.db
+
+# In src, track only train.py and inference.py.
+src/*
+!src/train.py
+!src/inference.py
+
+# Superseded root-level training scripts
+train_holdout.py
+train_5_fold_cross_validation.py
