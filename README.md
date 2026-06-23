@@ -298,8 +298,9 @@ installed by `environment.yml`.
 
 ## Licensing notice
 
-The source code in this repository is licensed under the Apache License 2.0.
-See [LICENSE](LICENSE) for the complete license text.
+The source code in this repository is licensed under the GNU General Public
+License, version 3 or later. See [LICENSE](LICENSE) for the complete license
+text.
 
 The trained model weights in `models/alhambra/aerosol/aerosol_weights.pth` and
 `models/alhambra/cloud/cloud_weights.pth` are licensed under the Creative
