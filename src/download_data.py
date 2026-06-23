@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import shutil
 import subprocess
@@ -14,9 +13,14 @@ import urllib.request
 import zipfile
 from pathlib import Path, PurePosixPath
 from typing import Iterable
+from urllib.parse import unquote, urlparse
 
 
 DEFAULT_DOI = "10.5281/zenodo.20156234"
+DEFAULT_DOWNLOAD_URL = (
+    "https://zenodo.org/records/20156234/files/"
+    "DL4Lidar.rar?download=1&preview=1"
+)
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE_SUFFIXES = {".rar", ".zip"}
 DOWNLOAD_CHUNK_SIZE = 8 * 1024 * 1024
@@ -40,13 +44,9 @@ def parse_args() -> argparse.Namespace:
         help="Local .rar or .zip archive to use instead of downloading.",
     )
     source.add_argument(
-        "--doi",
-        default=DEFAULT_DOI,
-        help=f"Zenodo DOI to download (default: {DEFAULT_DOI}).",
-    )
-    parser.add_argument(
-        "--zenodo-file",
-        help="Archive filename to select if the Zenodo record has several archives.",
+        "--url",
+        default=DEFAULT_DOWNLOAD_URL,
+        help="Dataset archive URL (defaults to the official Zenodo file).",
     )
     parser.add_argument(
         "--project-root",
@@ -62,76 +62,14 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def zenodo_record_id(doi: str) -> str:
-    prefix = "10.5281/zenodo."
-    if not doi.lower().startswith(prefix):
-        raise DatasetSetupError(
-            f"Expected a Zenodo DOI beginning with {prefix!r}; received {doi!r}."
-        )
-    record_id = doi[len(prefix) :]
-    if not record_id.isdigit():
-        raise DatasetSetupError(f"Could not determine a Zenodo record ID from {doi!r}.")
-    return record_id
-
-
-def request_json(url: str) -> dict:
-    request = urllib.request.Request(
-        url,
-        headers={"Accept": "application/json", "User-Agent": "DL4Lidar/1.0"},
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=60) as response:
-            return json.load(response)
-    except urllib.error.HTTPError as error:
-        if error.code == 404:
-            raise DatasetSetupError(
-                "The Zenodo record is not public yet. Use --archive with a local "
-                "copy until the DOI is published."
-            ) from error
-        raise DatasetSetupError(
-            f"Zenodo returned HTTP {error.code} while reading {url}."
-        ) from error
-    except (urllib.error.URLError, TimeoutError) as error:
-        raise DatasetSetupError(f"Could not connect to Zenodo: {error}") from error
-
-
-def select_zenodo_archive(record: dict, requested_name: str | None) -> dict:
-    candidates = [
-        item
-        for item in record.get("files", [])
-        if Path(str(item.get("key", ""))).suffix.lower() in ARCHIVE_SUFFIXES
-    ]
-    if requested_name:
-        matches = [item for item in candidates if item.get("key") == requested_name]
-        if len(matches) != 1:
-            raise DatasetSetupError(
-                f"Zenodo archive {requested_name!r} was not found in the record."
-            )
-        return matches[0]
-    if len(candidates) != 1:
-        names = ", ".join(str(item.get("key")) for item in candidates) or "none"
-        raise DatasetSetupError(
-            "Expected exactly one .rar or .zip archive in the Zenodo record; "
-            f"found: {names}. Use --zenodo-file to select one."
-        )
-    return candidates[0]
-
-
-def download_archive(doi: str, requested_name: str | None, destination: Path) -> Path:
-    record_id = zenodo_record_id(doi)
-    record = request_json(f"https://zenodo.org/api/records/{record_id}")
-    selected = select_zenodo_archive(record, requested_name)
-    filename = str(selected["key"])
-    links = selected.get("links", {})
-    url = links.get("content") or links.get("self")
-    if not url:
-        raise DatasetSetupError(
-            f"Zenodo did not provide a download link for {filename}."
-        )
+def download_archive(url: str, destination: Path) -> Path:
+    filename = Path(unquote(urlparse(url).path)).name
+    if Path(filename).suffix.lower() not in ARCHIVE_SUFFIXES:
+        raise DatasetSetupError("The download URL must point to a .rar or .zip file.")
 
     archive_path = destination / filename
     request = urllib.request.Request(url, headers={"User-Agent": "DL4Lidar/1.0"})
-    print(f"Downloading {filename} from {doi}...")
+    print(f"Downloading {filename} from Zenodo ({DEFAULT_DOI})...")
     try:
         with urllib.request.urlopen(request, timeout=120) as response:
             with archive_path.open("wb") as output:
@@ -153,6 +91,15 @@ def download_archive(doi: str, requested_name: str | None, destination: Path) ->
                         )
         if total:
             print()
+    except urllib.error.HTTPError as error:
+        archive_path.unlink(missing_ok=True)
+        if error.code == 404:
+            raise DatasetSetupError(
+                "The Zenodo file is not public yet. Use --archive with a local copy."
+            ) from error
+        raise DatasetSetupError(
+            f"Zenodo returned HTTP {error.code} while downloading the dataset."
+        ) from error
     except (urllib.error.URLError, TimeoutError, OSError) as error:
         archive_path.unlink(missing_ok=True)
         raise DatasetSetupError(f"Dataset download failed: {error}") from error
@@ -331,7 +278,7 @@ def run(args: argparse.Namespace) -> Path:
             if not archive.is_file():
                 raise DatasetSetupError(f"Local archive does not exist: {archive}")
         else:
-            archive = download_archive(args.doi, args.zenodo_file, temp_dir)
+            archive = download_archive(args.url, temp_dir)
 
         extraction_root = temp_dir / "extracted"
         extraction_root.mkdir()

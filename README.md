@@ -13,9 +13,8 @@ If you use this project in your research, please cite the associated article:
 > Cloud Segmentation in Ground-Based and Spaceborne Lidar Observations",
 > *IEEE Transactions on Geoscience and Remote Sensing*, 2026 (In Press).
 
-The dataset archive has been assigned
-[DOI 10.5281/zenodo.20156234](https://doi.org/10.5281/zenodo.20156234). Please
-use the citation metadata provided by Zenodo once the record is published.
+The dataset can be downloaded from [DOI 10.5281/zenodo.20156234](https://doi.org/10.5281/zenodo.20156234). Please
+use the citation provided by Zenodo when using this dataset.
 
 ## Repository structure
 
@@ -57,10 +56,10 @@ repository, download and prepare it with:
 python src/download_data.py
 ```
 
-The script obtains the archive associated with DOI
-`10.5281/zenodo.20156234`, validates its contents, and creates `data/` in the
-repository root. It supports ZIP archives directly. RAR archives require
-WinRAR/UnRAR or 7-Zip to be installed and available on the system.
+The script downloads `DL4Lidar.rar` directly from the dataset's Zenodo record,
+validates its contents, and creates `data/` in the repository root. RAR
+extraction requires WinRAR/UnRAR or 7-Zip to be installed and available on the
+system.
 
 If the archive has already been downloaded, prepare it without accessing
 Zenodo:
@@ -297,10 +296,12 @@ after selecting `cu126`, `cu129`, or `cpu`, because it would attempt to replace
 that selection with the CUDA 12.8 builds. The shared dependencies are already
 installed by `environment.yml`.
 
-## License
+## Licensing notice
 
-Copyright (C) 2026 Adrián Canella Ortiz and contributors.
+The source code in this repository is licensed under the Apache License 2.0.
+See [LICENSE](LICENSE) for the complete license text.
 
-This project is licensed under the GNU General Public License, version 3 or (at
-your option) any later version. See [LICENSE](LICENSE) for the complete license
-text.
+The trained model weights in `models/alhambra/aerosol/aerosol_weights.pth` and
+`models/alhambra/cloud/cloud_weights.pth` are licensed under the Creative
+Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) license, as
+they are derived from Meta Detectron2 Model Zoo baselines.
