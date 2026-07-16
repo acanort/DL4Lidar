@@ -37,13 +37,14 @@ DL4Lidar/
   pyproject.toml
 ```
 
-The model weights are stored with Git LFS. Install Git LFS before cloning to
-download them automatically:
+The pretrained model assets are distributed separately through Zenodo record
+`21379786` and stored locally under `models/alhambra/{aerosol,cloud}`. Git
+LFS is not needed for this repository anymore.
 
-```bash
-git lfs install
-git clone https://github.com/acanort/DL4Lidar.git
-cd DL4Lidar
+After cloning the repository, download or copy the model files into place with:
+
+```console
+python src/download_weights.py
 ```
 
 
@@ -201,7 +202,7 @@ or `full` for all outputs.
 The reference setup uses Windows 11, Python 3.9, PyTorch 2.8, CUDA 12.8, and a
 precompiled Detectron2 wheel. Before starting, install:
 
-- Git and Git LFS
+- Git
 - Miniconda or Anaconda
 - a current NVIDIA driver
 
@@ -302,7 +303,7 @@ The source code in this repository is licensed under the GNU General Public
 License, version 3 or later. See [LICENSE](LICENSE) for the complete license
 text.
 
-The trained model weights in `models/alhambra/aerosol/aerosol_weights.pth` and
-`models/alhambra/cloud/cloud_weights.pth` are licensed under the Creative
-Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) license, as
-they are derived from Meta Detectron2 Model Zoo baselines.
+The trained model assets in `models/alhambra/aerosol/` and
+`models/alhambra/cloud/` are licensed under the Creative Commons
+Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) license, as they are
+derived from Meta Detectron2 Model Zoo baselines.

@@ -46,6 +46,7 @@ src/*
 !src/train.py
 !src/inference.py
 !src/download_data.py
+!src/download_weights.py
 
 # Superseded root-level training scripts
 train_holdout.py
