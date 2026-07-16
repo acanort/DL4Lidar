@@ -41,7 +41,6 @@ DL4Lidar/
     train_holdout.py
     train_5_fold_cross_validation.py
   environment.yml
-  requirements.txt
   pyproject.toml
   LICENSE
   README.md
@@ -82,7 +81,8 @@ git clone https://github.com/acanort/DL4Lidar.git
 cd DL4Lidar
 ```
 
-Create and activate the Conda environment:
+Create and activate the Conda environment. The `environment.yml` file is the
+single dependency file for the shared project dependencies:
 
 ```console
 conda env create -n d2-dl4lidar -f environment.yml
@@ -107,13 +107,8 @@ This Detectron2 package is a third-party Windows wheel from
 not an official Detectron2 binary. It avoids compiling Detectron2's C++ and
 CUDA extensions locally.
 
-The remaining shared dependencies are installed by `environment.yml`. Running
-the following command is optional after PyTorch and Detectron2 are installed,
-and verifies that the pinned packages in `requirements.txt` are satisfied:
-
-```console
-python -m pip install -r requirements.txt
-```
+The PyTorch and Detectron2 commands are separate because the correct packages
+depend on your CUDA or CPU setup.
 
 Verify the installation:
 
@@ -285,9 +280,7 @@ python -m pip install torch==2.8.0+cpu torchvision==0.23.0+cpu torchaudio==2.8.0
 python -m pip install --extra-index-url https://miropsota.github.io/torch_packages_builder "detectron2==0.6+18f6958pt2.8.0cpu"
 ```
 
-CPU inference is supported but substantially slower. Do not run
-`requirements.txt` unchanged after selecting `cu126`, `cu129`, or `cpu`,
-because it pins the reference CUDA 12.8 packages.
+CPU inference is supported but substantially slower.
 
 ## Licensing
 
