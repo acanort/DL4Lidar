@@ -6,6 +6,8 @@ images. The repository contains the source code needed to download the
 associated datasets and pretrained models, train new models, and run inference
 with the trained ALHAMBRA models.
 
+![DL4Lidar graphical abstract](docs/assets/graphical_abstract.png)
+
 The source repository is intentionally lightweight. The datasets and pretrained
 model files are distributed separately through Zenodo and are downloaded into
 local folders that are ignored by Git.
