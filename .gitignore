@@ -33,9 +33,8 @@ inference/
 # Dataset downloaded from Zenodo
 data/
 
-# Track all model files, including model artifact extensions.
-!models/
-!models/**
+# Ignore local model artifacts and Zenodo-hosted files.
+models/
 
 # IDE / OS
 .vscode/
