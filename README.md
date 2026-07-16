@@ -156,8 +156,6 @@ models/alhambra/cloud/cloud_config.yaml
 models/alhambra/cloud/cloud_weights.pth
 ```
 
-Git LFS is not required. The `data/` and `models/` directories are external
-assets and are ignored by `.gitignore`.
 
 ## Dataset Layout
 
