@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import os
 import shutil
 import subprocess
@@ -22,44 +21,13 @@ DEFAULT_DOWNLOAD_URL = (
     "DL4Lidar.rar?download=1&preview=1"
 )
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_ROOT = PROJECT_ROOT / "data"
 ARCHIVE_SUFFIXES = {".rar", ".zip"}
 DOWNLOAD_CHUNK_SIZE = 8 * 1024 * 1024
 
 
 class DatasetSetupError(RuntimeError):
     """Raised when the dataset cannot be downloaded or prepared safely."""
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description=(
-            "Download the DL4Lidar archive from Zenodo and create data/. "
-            "Use --archive to prepare an already-downloaded copy."
-        )
-    )
-    source = parser.add_mutually_exclusive_group()
-    source.add_argument(
-        "--archive",
-        type=Path,
-        help="Local .rar or .zip archive to use instead of downloading.",
-    )
-    source.add_argument(
-        "--url",
-        default=DEFAULT_DOWNLOAD_URL,
-        help="Dataset archive URL (defaults to the official Zenodo file).",
-    )
-    parser.add_argument(
-        "--project-root",
-        type=Path,
-        default=PROJECT_ROOT,
-        help="Directory in which data/ will be created.",
-    )
-    parser.add_argument(
-        "--replace",
-        action="store_true",
-        help="Replace an existing data/ directory after extraction succeeds.",
-    )
-    return parser.parse_args()
 
 
 def download_archive(url: str, destination: Path) -> Path:
@@ -94,9 +62,7 @@ def download_archive(url: str, destination: Path) -> Path:
     except urllib.error.HTTPError as error:
         archive_path.unlink(missing_ok=True)
         if error.code == 404:
-            raise DatasetSetupError(
-                "The Zenodo file is not public yet. Use --archive with a local copy."
-            ) from error
+            raise DatasetSetupError("The Zenodo file is not public yet.") from error
         raise DatasetSetupError(
             f"Zenodo returned HTTP {error.code} while downloading the dataset."
         ) from error
@@ -245,13 +211,9 @@ def validate_dataset(data_dir: Path) -> tuple[int, int, int]:
     return len(files), len(json_files), len(image_files)
 
 
-def install_dataset(source: Path, target: Path, replace: bool) -> None:
+def install_dataset(source: Path, target: Path) -> None:
     if target.exists():
-        if not replace:
-            raise DatasetSetupError(
-                f"{target} already exists. Remove it or rerun with --replace."
-            )
-        shutil.rmtree(target)
+        raise DatasetSetupError(f"{target} already exists. Remove it and rerun.")
     target.mkdir(parents=True)
     for source_path in source.rglob("*"):
         destination = target / source_path.relative_to(source)
@@ -262,23 +224,15 @@ def install_dataset(source: Path, target: Path, replace: bool) -> None:
             shutil.copyfile(source_path, destination)
 
 
-def run(args: argparse.Namespace) -> Path:
-    project_root = args.project_root.resolve()
+def run() -> Path:
+    project_root = PROJECT_ROOT.resolve()
     project_root.mkdir(parents=True, exist_ok=True)
-    target = project_root / "data"
-    if target.exists() and not args.replace:
-        raise DatasetSetupError(
-            f"{target} already exists. Remove it or rerun with --replace."
-        )
+    if DATA_ROOT.exists():
+        raise DatasetSetupError(f"{DATA_ROOT} already exists. Remove it and rerun.")
 
     with tempfile.TemporaryDirectory(prefix=".dl4lidar-", dir=project_root) as temp:
         temp_dir = Path(temp)
-        if args.archive:
-            archive = args.archive.expanduser().resolve()
-            if not archive.is_file():
-                raise DatasetSetupError(f"Local archive does not exist: {archive}")
-        else:
-            archive = download_archive(args.url, temp_dir)
+        archive = download_archive(DEFAULT_DOWNLOAD_URL, temp_dir)
 
         extraction_root = temp_dir / "extracted"
         extraction_root.mkdir()
@@ -286,19 +240,19 @@ def run(args: argparse.Namespace) -> Path:
         extract_archive(archive, extraction_root)
         extracted_data = locate_data_directory(extraction_root)
         file_count, json_count, image_count = validate_dataset(extracted_data)
-        install_dataset(extracted_data, target, args.replace)
+        install_dataset(extracted_data, DATA_ROOT)
 
-    print(f"Dataset ready: {target}")
+    print(f"Dataset ready: {DATA_ROOT}")
     print(
         f"Validated {file_count:,} files "
         f"({json_count:,} JSON annotations, {image_count:,} images)."
     )
-    return target
+    return DATA_ROOT
 
 
 def main() -> None:
     try:
-        run(parse_args())
+        run()
     except DatasetSetupError as error:
         print(f"Error: {error}", file=sys.stderr)
         raise SystemExit(1) from error

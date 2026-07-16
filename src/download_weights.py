@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import shutil
 import sys
 import urllib.request
@@ -25,16 +24,6 @@ ZENODO_FILES = {
 }
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description=(
-            "Download the DL4Lidar pretrained model assets into "
-            "models/alhambra/{aerosol,cloud}."
-        )
-    )
-    return parser.parse_args()
-
-
 def is_url(value: str) -> bool:
     return urlparse(value).scheme.lower() in {"http", "https"}
 
@@ -50,7 +39,6 @@ def download_file(url: str, destination: Path) -> None:
 
 
 def main() -> int:
-    parse_args()
     downloads = (
         (MODEL_ROOT / "aerosol" / "aerosol_config.yaml", ZENODO_FILES["aerosol"]["config"]),
         (MODEL_ROOT / "aerosol" / "aerosol_weights.pth", ZENODO_FILES["aerosol"]["weights"]),

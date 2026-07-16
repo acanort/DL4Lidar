@@ -132,15 +132,8 @@ python src/download_data.py
 ```
 
 The script downloads `DL4Lidar.rar`, validates the extracted contents, and
-creates `data/` in the repository root. It refuses to overwrite an existing
-`data/` directory unless `--replace` is provided.
-
-If the archive has already been downloaded, prepare it without accessing
-Zenodo:
-
-```console
-python src/download_data.py --archive path/to/DL4Lidar.rar
-```
+creates `data/` in the repository root. It expects `data/` to be absent before
+running.
 
 Download the pretrained ALHAMBRA aerosol and cloud model assets from Zenodo DOI
 [10.5281/zenodo.21379786](https://doi.org/10.5281/zenodo.21379786):
